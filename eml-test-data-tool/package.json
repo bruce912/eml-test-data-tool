@@ -1,0 +1,63 @@
+{
+  "name": "eml-test-data-tool",
+  "private": true,
+  "version": "0.1.0",
+  "description": "將 EML 信件整理、去識別化並輸出 Dify 分類評估 CSV 的本機桌面工具",
+  "author": "Internal Tools Team",
+  "type": "module",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "test": "vitest run",
+    "desktop": "npm run build && electron .",
+    "dist:win": "npm run build && electron-builder --win portable --x64",
+    "dist:win:installer": "npm run build && electron-builder --win nsis --x64",
+    "dist:win:all": "npm run build && electron-builder --win portable nsis --x64"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "latest",
+    "vite": "latest",
+    "typescript": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "lucide-react": "latest"
+  },
+  "devDependencies": {
+    "electron": "latest",
+    "electron-builder": "latest",
+    "vitest": "latest"
+  },
+  "build": {
+    "appId": "tw.local.emltestdata",
+    "productName": "EML 測試資料整理器",
+    "asar": true,
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ],
+      "artifactName": "EML-Test-Data-Tool-${version}-${arch}.${ext}"
+    },
+    "portable": {
+      "artifactName": "EML-Test-Data-Tool-Portable-${version}-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "artifactName": "EML-Test-Data-Tool-Setup-${version}-${arch}.${ext}"
+    }
+  }
+}
