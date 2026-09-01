@@ -7,13 +7,13 @@ function cell(value: unknown): string {
 
 export function recordsToCsv(records: EmailRecord[]): string {
   const headers = [
-    'case_id', 'source_filename', 'subject', 'body', 'from', 'to', 'cc', 'received_date',
+    'case_id', 'source_format', 'source_filename', 'subject', 'body', 'from', 'to', 'cc', 'bcc', 'received_date',
     'message_id', 'expected_primary_category', 'expected_secondary_category', 'language',
     'has_attachment', 'review_status', 'detected_pii_count',
   ];
   const rows = records.map((record) => [
-    record.caseId, record.filename, record.anonymizedSubject, record.anonymizedBody,
-    record.anonymizedFrom, record.anonymizedTo, record.anonymizedCc, record.date,
+    record.caseId, record.sourceFormat, record.filename, record.anonymizedSubject, record.anonymizedBody,
+    record.anonymizedFrom, record.anonymizedTo, record.anonymizedCc, record.anonymizedBcc, record.date,
     record.messageId, record.primaryCategory, record.secondaryCategory, record.language,
     record.hasAttachment, record.reviewStatus,
     Object.values(record.piiCounts).reduce((sum, count) => sum + (count || 0), 0),

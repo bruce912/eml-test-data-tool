@@ -1,0 +1,18 @@
+From: "範例商店財務" <billing@example.com>
+To: buyer.beta@example.com
+Cc: sales@example.com
+Bcc: audit@example.com
+Date: Tue, 01 Sep 2026 10:30:00 +0800
+Message-ID: <test-invoice-002@example.invalid>
+Subject: 電子發票統一編號更正
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+您好：
+
+請協助將測試訂單 INV-20260901-002 的買受人統一編號更正為 12345678。
+公司名稱：虛構科技股份有限公司。
+回覆信箱：buyer.beta@example.com。
+
+以上公司與資料均為虛構測試內容。

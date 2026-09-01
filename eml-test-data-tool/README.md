@@ -1,6 +1,10 @@
-# EML 測試資料整理器
+# 郵件測試資料整理器
 
-本機瀏覽器工具，用來批次匯入 `.eml`、解析信件、套用去識別化規則、人工標註預期分類，並匯出 Dify 評估用 CSV。
+線上版：[GitHub Pages](https://bruce912.github.io/eml-test-data-tool/)
+
+本機工具，用來混合批次匯入 `.eml` 與 Microsoft Outlook `.msg`、解析信件、套用去識別化規則、人工標註預期分類，並匯出 Dify 評估用 CSV。
+
+也可將人工修訂後的去識別化內容匯出成新的 `.eml`。單封信直接下載 EML，多封信會打包為 ZIP；輸出不包含原始附件、傳輸路徑或郵件簽章標頭，也不會覆寫來源檔。
 
 ## 使用
 
@@ -9,7 +13,9 @@ npm install
 npm run dev
 ```
 
-開啟終端顯示的本機網址後，拖曳或選擇 `.eml` 檔案。所有檔案只在瀏覽器記憶體中處理，不會自動上傳。
+開啟終端顯示的本機網址後，拖曳或選擇 `.eml`、`.msg` 檔案，可以混合多選。所有檔案只在本機記憶體中處理，不會自動上傳。
+
+`.msg` 解析支援 Outlook MAPI 主旨、寄件者、To／CC／BCC、本文、時間、Message-ID 與附件存在狀態。若只有 HTML 本文會自動轉成純文字；Exchange 內部地址會優先採用可取得的 SMTP 地址。
 
 ## Windows 執行檔
 
@@ -45,10 +51,11 @@ npm run dist:win:installer   # NSIS 安裝版
 ## CSV 欄位
 
 - `case_id`
+- `source_format`（`eml` 或 `msg`）
 - `source_filename`
 - `subject`
 - `body`
-- `from` / `to` / `cc`
+- `from` / `to` / `cc` / `bcc`
 - `received_date` / `message_id`
 - `expected_primary_category`
 - `expected_secondary_category`

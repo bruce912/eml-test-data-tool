@@ -2,7 +2,7 @@
   "name": "eml-test-data-tool",
   "private": true,
   "version": "0.1.0",
-  "description": "將 EML 信件整理、去識別化並輸出 Dify 分類評估 CSV 的本機桌面工具",
+  "description": "將 EML 與 Outlook MSG 信件整理、去識別化並輸出 Dify 分類評估 CSV 的本機桌面工具",
   "author": "Internal Tools Team",
   "type": "module",
   "main": "electron/main.cjs",
@@ -16,12 +16,14 @@
     "dist:win:all": "npm run build && electron-builder --win portable nsis --x64"
   },
   "dependencies": {
+    "@kenjiuno/msgreader": "^1.28.0",
     "@vitejs/plugin-react": "latest",
-    "vite": "latest",
-    "typescript": "latest",
+    "buffer": "^6.0.3",
+    "lucide-react": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "lucide-react": "latest"
+    "typescript": "latest",
+    "vite": "latest"
   },
   "devDependencies": {
     "electron": "latest",
@@ -30,7 +32,7 @@
   },
   "build": {
     "appId": "tw.local.emltestdata",
-    "productName": "EML 測試資料整理器",
+    "productName": "郵件測試資料整理器",
     "asar": true,
     "directories": {
       "output": "release"
@@ -44,7 +46,9 @@
       "target": [
         {
           "target": "portable",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "artifactName": "EML-Test-Data-Tool-${version}-${arch}.${ext}"

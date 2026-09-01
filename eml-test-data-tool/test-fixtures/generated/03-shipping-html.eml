@@ -1,0 +1,19 @@
+From: "物流測試中心" <shipping@example.com>
+To: receiver.gamma@example.com
+Date: Tue, 01 Sep 2026 11:45:00 +0800
+Message-ID: <test-shipping-003@example.invalid>
+Subject: 配送地址變更申請
+MIME-Version: 1.0
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+<!doctype html>
+<html lang="zh-Hant">
+  <body>
+    <p>您好，我是測試收件人丙。</p>
+    <p>請將訂單 <strong>SHIP-20260901-003</strong> 的地址改為：</p>
+    <p>高雄市前鎮區測試路 100 號 8 樓</p>
+    <p>測試電話：0900-000-003</p>
+    <p>本郵件僅供系統測試。</p>
+  </body>
+</html>

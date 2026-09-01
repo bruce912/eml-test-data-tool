@@ -1,0 +1,25 @@
+From: "測試顧客戊" <complaint.epsilon@example.com>
+To: complaints@example.com
+Date: Tue, 01 Sep 2026 15:05:00 +0800
+Message-ID: <test-complaint-005@example.invalid>
+Subject: 商品重複扣款客訴
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="TEST-ALT-005"
+
+--TEST-ALT-005
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+您好，我是測試顧客戊。訂單 PAY-20260901-005 疑似重複扣款，請協助查明。
+測試卡號 4111-1111-1111-1111，聯絡信箱 complaint.epsilon@example.com。
+本資料完全虛構。
+
+--TEST-ALT-005
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+<p>您好，我是<strong>測試顧客戊</strong>。</p>
+<p>訂單 PAY-20260901-005 疑似重複扣款，請協助查明。</p>
+<p>本資料完全虛構。</p>
+
+--TEST-ALT-005--

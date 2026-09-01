@@ -1,0 +1,16 @@
+From: "測試客戶甲" <customer.alpha@example.com>
+To: service@example.com
+Cc: accounting@example.com
+Date: Tue, 01 Sep 2026 09:15:00 +0800
+Message-ID: <test-refund-001@example.invalid>
+Subject: 退款進度查詢
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+您好：
+
+我是測試客戶甲，訂單編號 ORD-20260901-0001，想詢問退款進度。
+聯絡信箱 customer.alpha@example.com，測試電話 0900-000-001。
+
+此郵件為完全虛構的測試資料。

@@ -26,10 +26,12 @@ export interface AnonymizeOptions {
 
 export interface ParsedEmail {
   filename: string;
+  sourceFormat: 'eml' | 'msg';
   subject: string;
   from: string;
   to: string;
   cc: string;
+  bcc: string;
   date: string;
   messageId: string;
   body: string;
@@ -43,6 +45,7 @@ export interface EmailRecord extends ParsedEmail {
   anonymizedFrom: string;
   anonymizedTo: string;
   anonymizedCc: string;
+  anonymizedBcc: string;
   anonymizedBody: string;
   piiCounts: PiiCounts;
   primaryCategory: string;

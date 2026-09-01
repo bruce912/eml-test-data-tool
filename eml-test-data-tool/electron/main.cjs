@@ -11,7 +11,7 @@ function createWindow() {
     minHeight: 720,
     show: false,
     backgroundColor: '#f4f7f9',
-    title: 'EML 測試資料整理器',
+    title: '郵件測試資料整理器',
     autoHideMenuBar: true,
     webPreferences: {
       contextIsolation: true,

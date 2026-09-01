@@ -1,0 +1,26 @@
+From: "合作測試窗口" <partner.zeta@example.com>
+To: business@example.com
+Date: Tue, 01 Sep 2026 16:40:00 +0800
+Message-ID: <test-partner-006@example.invalid>
+Subject: 合作提案與測試附件
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="TEST-MIXED-006"
+
+--TEST-MIXED-006
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+您好：
+
+我是合作測試窗口，想詢問 API 串接合作方式。
+提案代碼 PARTNER-20260901-006，聯絡電話 0900-000-006。
+附件只是測試文字，不含真實資料。
+
+--TEST-MIXED-006
+Content-Type: text/plain; name="synthetic-proposal.txt"
+Content-Disposition: attachment; filename="synthetic-proposal.txt"
+Content-Transfer-Encoding: base64
+
+VGhpcyBpcyBhIHN5bnRoZXRpYyB0ZXN0IGF0dGFjaG1lbnQu
+
+--TEST-MIXED-006--

@@ -2,13 +2,14 @@ import { useMemo, useRef, useState } from 'react';
 import { Check, ChevronDown, Download, Mail, RefreshCw, ShieldCheck, UploadCloud } from 'lucide-react';
 import { anonymizeFields, defaultOptions, piiLabel } from './lib/anonymize';
 import { downloadCsv } from './lib/csv';
-import { readEmlFile } from './lib/eml';
+import { downloadAnonymizedEml } from './lib/eml-export';
+import { readMailFile, supportedMailExtension } from './lib/mail';
 import type { AnonymizeOptions, EmailRecord, PiiKind } from './types';
 import './styles.css';
 
 const categories = ['', '帳務與發票', '退款申請', '訂單與出貨', '系統操作問題', '帳號與權限', '合作與業務', '客訴', '其他／無法判斷'];
 
-function makeRecord(parsed: Awaited<ReturnType<typeof readEmlFile>>, index: number, options: AnonymizeOptions): EmailRecord {
+function makeRecord(parsed: Awaited<ReturnType<typeof readMailFile>>, index: number, options: AnonymizeOptions): EmailRecord {
   const anon = anonymizeFields(parsed, options);
   return {
     ...parsed,
@@ -17,6 +18,7 @@ function makeRecord(parsed: Awaited<ReturnType<typeof readEmlFile>>, index: numb
     anonymizedFrom: anon.from,
     anonymizedTo: anon.to,
     anonymizedCc: anon.cc,
+    anonymizedBcc: anon.bcc,
     anonymizedBody: anon.body,
     piiCounts: anon.counts,
     primaryCategory: '',
@@ -43,15 +45,16 @@ export default function App() {
   const reviewed = records.filter((record) => record.reviewStatus === 'reviewed').length;
 
   async function importFiles(files: FileList | File[]) {
-    const emlFiles = Array.from(files).filter((file) => file.name.toLowerCase().endsWith('.eml'));
-    if (!emlFiles.length) return;
+    const mailFiles = Array.from(files).filter((file) => supportedMailExtension.test(file.name));
+    if (!mailFiles.length) return;
     setLoading(true);
     const start = records.length;
-    const parsed = await Promise.all(emlFiles.map(async (file, index) => {
+    const parsed = await Promise.all(mailFiles.map(async (file, index) => {
       try {
-        return makeRecord(await readEmlFile(file), start + index, options);
+        return makeRecord(await readMailFile(file), start + index, options);
       } catch (error) {
-        const empty = { filename: file.name, subject: '', from: '', to: '', cc: '', date: '', messageId: '', body: '', hasAttachment: false, language: 'und' };
+        const sourceFormat = file.name.toLowerCase().endsWith('.msg') ? 'msg' as const : 'eml' as const;
+        const empty = { filename: file.name, sourceFormat, subject: '', from: '', to: '', cc: '', bcc: '', date: '', messageId: '', body: '', hasAttachment: false, language: 'und' };
         return { ...makeRecord(empty, start + index, options), error: error instanceof Error ? error.message : '無法解析' };
       }
     }));
@@ -65,7 +68,7 @@ export default function App() {
     setOptions(nextOptions);
     setRecords((current) => current.map((record) => {
       const anon = anonymizeFields(record, nextOptions);
-      return { ...record, anonymizedSubject: anon.subject, anonymizedFrom: anon.from, anonymizedTo: anon.to, anonymizedCc: anon.cc, anonymizedBody: anon.body, piiCounts: anon.counts };
+      return { ...record, anonymizedSubject: anon.subject, anonymizedFrom: anon.from, anonymizedTo: anon.to, anonymizedCc: anon.cc, anonymizedBcc: anon.bcc, anonymizedBody: anon.body, piiCounts: anon.counts };
     }));
   }
 
@@ -76,15 +79,15 @@ export default function App() {
   return (
     <div className="app-shell">
       <header>
-        <div className="brand"><Mail size={23} /> EML 測試資料整理器</div>
+        <div className="brand"><Mail size={23} /> 郵件測試資料整理器</div>
         <div className="privacy"><ShieldCheck size={17} /> 所有資料僅在此瀏覽器處理</div>
       </header>
 
       <aside>
         <nav>
-          {['匯入信件', '去識別化', '檢查與標註', '匯出 CSV'].map((label, index) => (
+          {['匯入信件', '去識別化', '檢查與標註', '匯出資料'].map((label, index) => (
             <div className={`step ${index === 0 ? 'active' : ''}`} key={label}>
-              <span>{index + 1}</span><div><strong>{label}</strong><small>{['匯入多個 .eml 檔案', '套用規則移除敏感資訊', '檢查內容並指定預期類別', '匯出給 Dify 評估使用'][index]}</small></div>
+              <span>{index + 1}</span><div><strong>{label}</strong><small>{['匯入多個 .eml／.msg 檔案', '套用規則移除敏感資訊', '檢查內容並指定預期類別', '匯出 CSV 或去識別化 EML'][index]}</small></div>
             </div>
           ))}
         </nav>
@@ -110,9 +113,9 @@ export default function App() {
           onDrop={(event) => { event.preventDefault(); setDragging(false); importFiles(event.dataTransfer.files); }}
         >
           <UploadCloud size={39} />
-          <div><strong>拖曳 .eml 檔案到此處，或</strong><small>可多選上傳・檔案只在瀏覽器記憶體中處理</small></div>
-          <button className="primary" onClick={() => inputRef.current?.click()} disabled={loading}>{loading ? '解析中…' : '選擇 EML 檔'}</button>
-          <input ref={inputRef} type="file" multiple accept=".eml,message/rfc822" hidden onChange={(event) => event.target.files && importFiles(event.target.files)} />
+          <div><strong>拖曳 .eml 或 .msg 檔案到此處，或</strong><small>可混合多選・檔案只在本機記憶體中處理</small></div>
+          <button className="primary" onClick={() => inputRef.current?.click()} disabled={loading}>{loading ? '解析中…' : '選擇郵件檔'}</button>
+          <input ref={inputRef} type="file" multiple accept=".eml,.msg,message/rfc822,application/vnd.ms-outlook" hidden onChange={(event) => event.target.files && importFiles(event.target.files)} />
         </section>
 
         <section className="summary">
@@ -129,10 +132,10 @@ export default function App() {
             <table>
               <thead><tr><th>檔名</th><th>主旨（預覽）</th><th>寄件者</th><th>偵測到的 PII</th><th>預期主類別</th><th>狀態</th></tr></thead>
               <tbody>
-                {!records.length && <tr><td colSpan={6} className="empty">尚無資料。請先拖曳或選擇 EML 檔案。</td></tr>}
+                {!records.length && <tr><td colSpan={6} className="empty">尚無資料。請先拖曳或選擇 EML／MSG 檔案。</td></tr>}
                 {records.map((record, index) => (
                   <tr key={`${record.filename}-${index}`} className={selected === index ? 'selected' : ''} onClick={() => setSelected(index)}>
-                    <td><Mail size={15} />{record.filename}</td>
+                    <td><Mail size={15} /><span className="format-label">{record.sourceFormat.toUpperCase()}</span>{record.filename}</td>
                     <td>{record.anonymizedSubject || '（無主旨）'}</td>
                     <td className="mono">{record.anonymizedFrom || '—'}</td>
                     <td><div className="tags">{Object.entries(record.piiCounts).filter(([, count]) => count).slice(0, 3).map(([kind, count]) => <span key={kind}>{piiLabel[kind as PiiKind]} {count}</span>)}</div></td>
@@ -154,7 +157,7 @@ export default function App() {
             </div>}
           </div>
           <div className="compare">
-            <article><h3>原始內容（僅本機顯示）</h3><pre>{active ? `From: ${active.from}\nTo: ${active.to}\nSubject: ${active.subject}\n\n${active.body}` : '匯入信件後，可在此檢查原始內容。'}</pre></article>
+            <article><h3>原始內容（僅本機顯示）</h3><pre>{active ? `Format: ${active.sourceFormat.toUpperCase()}\nFrom: ${active.from}\nTo: ${active.to}\nCc: ${active.cc}\nBcc: ${active.bcc}\nSubject: ${active.subject}\n\n${active.body}` : '匯入信件後，可在此檢查原始內容。'}</pre></article>
             <article><h3>去識別化內容（可直接編輯）</h3>{active ? <textarea value={active.anonymizedBody} onChange={(event) => updateRecord(selected, { anonymizedBody: event.target.value })} /> : <pre>去識別化內容會顯示在此處。</pre>}</article>
             <aside className="legend"><h3>PII 標籤</h3>{active && Object.entries(active.piiCounts).filter(([, count]) => count).map(([kind, count]) => <div key={kind}><span>{piiLabel[kind as PiiKind]}</span><strong>{count}</strong></div>)}</aside>
           </div>
@@ -163,8 +166,11 @@ export default function App() {
       </main>
 
       <footer>
-        <span>{records.length ? `將匯出 ${records.length} 筆資料；建議先完成所有人工檢查。` : '匯入 EML 後即可建立測試資料。'}</span>
-        <button className="primary export" disabled={!records.length} onClick={() => downloadCsv(records)}><Download size={17} />匯出 CSV</button>
+        <span>{records.length ? `將匯出 ${records.length} 筆資料；建議先完成所有人工檢查。` : '匯入 EML／MSG 後即可建立測試資料。'}</span>
+        <div className="export-actions">
+          <button className="secondary export" disabled={!records.length} onClick={() => downloadAnonymizedEml(records)}><Mail size={17} />{records.length > 1 ? '匯出去識別化 EML（ZIP）' : '匯出去識別化 EML'}</button>
+          <button className="primary export" disabled={!records.length} onClick={() => downloadCsv(records)}><Download size={17} />匯出 CSV</button>
+        </div>
       </footer>
     </div>
   );

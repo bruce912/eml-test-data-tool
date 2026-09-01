@@ -70,7 +70,7 @@ function displayName(address: string): string {
 }
 
 export function anonymizeFields(
-  fields: { subject: string; from: string; to: string; cc: string; body: string },
+  fields: { subject: string; from: string; to: string; cc: string; bcc?: string; body: string },
   options: AnonymizeOptions,
 ) {
   const state = makeState();
@@ -94,6 +94,7 @@ export function anonymizeFields(
     from: process(fields.from),
     to: process(fields.to),
     cc: process(fields.cc),
+    bcc: process(fields.bcc || ''),
     body: process(fields.body),
     counts: state.counts,
   };
