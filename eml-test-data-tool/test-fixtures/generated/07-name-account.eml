@@ -1,0 +1,15 @@
+From: service@example.com
+To: support@example.com
+Date: Tue, 01 Sep 2026 17:10:00 +0800
+Message-ID: <test-name-account-007@example.invalid>
+Subject: 王小明的帳號 member_7788 無法登入
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+姓名：王小明
+大名：陳美玲
+會員帳號：member_7788
+User ID: EMP-2048
+
+以上姓名與帳號均為完全虛構的測試資料。

@@ -1,5 +1,6 @@
 export type PiiKind =
   | 'person'
+  | 'account'
   | 'email'
   | 'phone'
   | 'address'
@@ -13,6 +14,7 @@ export type PiiCounts = Partial<Record<PiiKind, number>>;
 
 export interface AnonymizeOptions {
   person: boolean;
+  account: boolean;
   email: boolean;
   phone: boolean;
   address: boolean;

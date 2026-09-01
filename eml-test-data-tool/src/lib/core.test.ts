@@ -22,7 +22,7 @@ describe('EML parser', () => {
     const fixtureDir = fileURLToPath(new URL('../../test-fixtures/generated/', import.meta.url));
     const filenames = readdirSync(fixtureDir).filter((name) => name.endsWith('.eml'));
     const parsed = filenames.map((filename) => parseEml(readFileSync(`${fixtureDir}/${filename}`, 'utf8'), filename));
-    expect(parsed).toHaveLength(6);
+    expect(parsed).toHaveLength(7);
     expect(parsed.every((mail) => mail.subject && mail.body)).toBe(true);
     expect(parsed.find((mail) => mail.filename === '06-with-attachment.eml')?.hasAttachment).toBe(true);
   });
@@ -60,6 +60,29 @@ describe('anonymizer', () => {
     expect(result.body).toContain('[EMAIL_1]');
     expect(result.body).toContain('[PHONE_1]');
     expect(result.body).toContain('[ORDER_ID_1]');
+  });
+
+  it('detects names from common Chinese name labels and reuses the same token', () => {
+    const result = anonymizeFields({
+      subject: '王小明的服務申請', from: 'service@example.com', to: '', cc: '', bcc: '',
+      body: '姓名：王小明\n請問您的大名？聯絡人是陳美玲。以上姓名與帳號均為虛構。',
+    }, defaultOptions);
+    expect(result.subject).toContain('[PERSON_1]');
+    expect(result.body).toContain('姓名：[PERSON_1]');
+    expect(result.body).toContain('聯絡人是[PERSON_2]');
+    expect(result.body).toContain('以上姓名與帳號均為虛構');
+    expect(result.counts.person).toBe(2);
+  });
+
+  it('detects login and member account identifiers', () => {
+    const result = anonymizeFields({
+      subject: '帳號 member_7788 無法登入', from: '', to: '', cc: '', bcc: '',
+      body: '會員帳號：member_7788\nUser ID: EMP-2048',
+    }, defaultOptions);
+    expect(result.subject).toContain('[ACCOUNT_1]');
+    expect(result.body).toContain('會員帳號：[ACCOUNT_1]');
+    expect(result.body).toContain('User ID: [ACCOUNT_2]');
+    expect(result.counts.account).toBe(2);
   });
 });
 

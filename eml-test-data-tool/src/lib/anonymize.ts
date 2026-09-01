@@ -2,6 +2,7 @@ import type { AnonymizeOptions, PiiCounts, PiiKind } from '../types';
 
 export const defaultOptions: AnonymizeOptions = {
   person: true,
+  account: true,
   email: true,
   phone: true,
   address: true,
@@ -25,7 +26,7 @@ const patterns: Array<{ kind: PiiKind; regex: RegExp }> = [
 ];
 
 const labels: Record<PiiKind, string> = {
-  person: 'PERSON', email: 'EMAIL', phone: 'PHONE', address: 'ADDRESS',
+  person: 'PERSON', account: 'ACCOUNT', email: 'EMAIL', phone: 'PHONE', address: 'ADDRESS',
   nationalId: 'NATIONAL_ID', companyId: 'COMPANY_ID', orderId: 'ORDER_ID',
   card: 'CARD', url: 'URL',
 };
@@ -69,17 +70,33 @@ function displayName(address: string): string {
   return beforeAngle;
 }
 
+const personContextPattern = /(?:(?:姓名|人名|大名|名字|聯絡人|申請人|收件人|寄件人)(?:\s*(?:為|是|叫|[:：])\s*|\s+)|(?:我是|本人是)\s*)([\u3400-\u9fff·]{2,8})/gu;
+const accountContextPattern = /(?:會員帳號|登入帳號|使用者帳號|用戶帳號|帳號|account|username|user\s*id)\s*(?:為|是|[:：]|\s)\s*([\p{L}\p{N}][\p{L}\p{N}._-]{1,63})/giu;
+
+function contextualValues(text: string, regex: RegExp): string[] {
+  return Array.from(text.matchAll(regex), (match) => match[1]?.trim()).filter((value): value is string => Boolean(value));
+}
+
 export function anonymizeFields(
   fields: { subject: string; from: string; to: string; cc: string; bcc?: string; body: string },
   options: AnonymizeOptions,
 ) {
   const state = makeState();
+  const combined = [fields.subject, fields.from, fields.to, fields.cc, fields.bcc || '', fields.body].join('\n');
   const names = options.person
-    ? [displayName(fields.from), ...options.customTerms].filter((name) => name.length >= 2)
+    ? [displayName(fields.from), ...contextualValues(combined, personContextPattern), ...options.customTerms]
+      .filter((name, index, all) => name.length >= 2 && all.indexOf(name) === index)
+    : [];
+  const accounts = options.account
+    ? contextualValues(combined, accountContextPattern)
+      .filter((account, index, all) => !account.includes('@') && all.indexOf(account) === index)
     : [];
 
   const process = (input: string) => {
     let output = input;
+    for (const account of accounts) {
+      output = replaceKind(output, 'account', new RegExp(escapeRegExp(account), 'giu'), state);
+    }
     for (const { kind, regex } of patterns) {
       if (options[kind]) output = replaceKind(output, kind, regex, state);
     }
@@ -101,6 +118,6 @@ export function anonymizeFields(
 }
 
 export const piiLabel: Record<PiiKind, string> = {
-  person: '人名', email: '電子郵件', phone: '電話', address: '地址', nationalId: '身分證',
+  person: '人名／姓名／大名', account: '帳號', email: '電子郵件', phone: '電話', address: '地址', nationalId: '身分證',
   companyId: '統一編號', orderId: '訂單／代碼', card: '卡號', url: '網址',
 };

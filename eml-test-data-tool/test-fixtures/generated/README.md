@@ -8,5 +8,6 @@
 - `04-account-access.eml`：帳號與權限問題
 - `05-complaint-multipart.eml`：multipart/alternative、客訴、測試卡號
 - `06-with-attachment.eml`：multipart/mixed、測試附件
+- `07-name-account.eml`：姓名／大名語境與會員帳號／User ID
 
 建議一次選取六封信，驗證批次匯入、去識別化、人工分類、CSV，以及 ZIP 形式的去識別化 EML 匯出。
