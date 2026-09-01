@@ -2,6 +2,8 @@
 
 線上版：[GitHub Pages](https://bruce912.github.io/eml-test-data-tool/)
 
+`main` 分支更新時，GitHub Actions 會自動測試、建置並重新部署線上版。
+
 本機工具，用來混合批次匯入 `.eml` 與 Microsoft Outlook `.msg`、解析信件、套用去識別化規則、人工標註預期分類，並匯出 Dify 評估用 CSV。
 
 也可將人工修訂後的去識別化內容匯出成新的 `.eml`。單封信直接下載 EML，多封信會打包為 ZIP；輸出不包含原始附件、傳輸路徑或郵件簽章標頭，也不會覆寫來源檔。
